@@ -73,13 +73,16 @@ args = parser.parse_args()
 
 # Gestion de l'argument genre et ses sous-arguments
 # Pour chaque argument qui est dans le dictionnaire dans le for,
-for PremierArg in ['titre','genre','sousgenre','artiste','album']:
+for nomArgument in ['titre','genre','sousgenre','artiste','album']:
     # Si l'argument est renseigné
-    if getattr(args, PremierArg) is not None:
+    if getattr(args, nomArgument) is not None:
+        # Comme on a spécifié que les arguments avaient la propriété "append", l'argument args.genre devient non plus une liste (avec un str et un int) mais une
+        # liste de liste avec un str et un int
+        # Donc pour chaque argument 
         # On écrit la valeur de ses ss-arg dans le fichier de logs
-        logging.info(' Argument --' + PremierArg + ' :\t' + getattr(args, PremierArg)[0] + ' ; ' + getattr(args, PremierArg)[1])
+        logging.info(' Argument --' + nomArgument + ' :\t' + getattr(args, nomArgument)[0] + ' ; ' + getattr(args, nomArgument)[1])
         # Puis on vérifie que le 2eme ss-arg de l'argument est correct et on le remplace par la nouvelle valeure créée lors de la vérification
-        checkSousArgs(getattr(args, PremierArg), PremierArg)
+        checkSousArgs(getattr(args, nomArgument), nomArgument)
 # Ecriture d'une ligne d'étoiles dans le fichier de log, pour séparrer les infos en fonction de chaque exécution
 logging.debug(' *****************************************')
 logging.shutdown()
