@@ -9,7 +9,7 @@ from GestionDesArguments import Arguments
 listeArgumentsCLI = Arguments.initListeArguments()
 # On spécifie la configuration du fichier de log
 Arguments.initLoggingConfig()
-
+# On analyse les argument saisis
 Arguments.checkListeDesArguments(listeArgumentsCLI)
 
 # Ecriture d'une ligne d'étoiles dans le fichier de log, pour séparrer les infos en fonction de chaque exécution

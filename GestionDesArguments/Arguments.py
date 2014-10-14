@@ -43,30 +43,38 @@ def initListeArguments():
     return parser.parse_args()
 
 ''' vérifie qu'un argument donné en paramètre est bien un nombre entier, et qu'il ne dépasse pas 100 '''
-def checkSousArgs(unArgument, nomDeLArgument):
+def checkSousArgs(unArgument, nomDeLArgument, indice):
     try:
         # Conversion en entier
         unArgument[1] = int(unArgument[1])
         # Si nb n'est pas un entier naturel et qu'il est supérieur ou égal à 100, on lève une exception, et on met dans nb, la valeur absolue qu'il contenait
         # Si le 2ème ss-arg est inférieur à zéro, on ne garde que sa valeur absolue et on lève et écrit une exception dans le fichier de logs
         if (checkIntNatural(unArgument[1]) == False):
-            raise Exception('" doit être positive !')
-            unArgument[1] = abs(unArgument[1])
+            raise Exception('" doit être positive !\n\t La valeur absolue de "' + str(unArgument[1]) + '" a été retenue à la place...')
         # Si le 2ème ss-arg est supérieur à 100, on ne garde pas sa valeur, on la remplace par 0
         if (checkIntInfCent(unArgument[1]) == False):
             raise Exception('" doit être inférieure à "100" !')
             unArgument[1] = 0
+        # On ne garde que la valeur absolue du pourcentage saisi
+        unArgument[1] = controlIntNatural(unArgument[1])
         # Ensuite, on indique qu'on utilise la variable globale args, et on modifie les ss-arg avec la transformation précédament effectuée
         global args
-        setattr(args, nomDeLArgument, [unArgument[0], unArgument[1]])
+        setattr(args, nomDeLArgument[indice], [unArgument[0], unArgument[1]])
     except ValueError:
         logging.error(' --' + nomDeLArgument + ', impossible de convertir "' + unArgument[1] + '" en nombre entier !')
     except Exception as er:
-        logging.warning(' --' + nomDeLArgument + ', la valeur "' + unArgument[1] + er.args[1])
+        logging.warning(' --' + nomDeLArgument + ', la valeur "' + str(unArgument[1]) + er.args[0])
              
-''' Vérifie qu'un nombre est un entier naturel '''
+''' Vérifie qu'un nombre est un entier naturel (> 0) '''
 def checkIntNatural(nb):
     return nb > 0
+    
+''' Retourne la valeur absolue du nombre passé en paramètre s'il est inférieur à 0, sinon, il le retourne sans l'avoir modifié '''
+def controlIntNatural(nb):
+    if(checkIntNatural(nb) == True):
+        return nb
+    else:
+        return abs(nb)
     
 ''' Vérifie qu'un nombre est inférieur à 100 '''
 def checkIntInfCent(nb):
@@ -81,6 +89,9 @@ def checkListeDesArguments(listeDArguments):
             # liste de liste avec un str et un int
             # Donc pour chaque argument 
             # On écrit la valeur de ses ss-arg dans le fichier de logs
-            logging.info(' Argument --' + nomArgument + ' :\t' + getattr(listeDArguments, nomArgument[0])[0] + ' ; ' + getattr(listeDArguments, nomArgument[0])[1])
+            logging.info(' Argument --' + nomArgument + ' :\t' + getattr(listeDArguments, nomArgument)[0][0] + ' ; ' + getattr(listeDArguments, nomArgument)[0][1])
             # Puis on vérifie que le 2eme ss-arg de l'argument est correct et on le remplace par la nouvelle valeure créée lors de la vérification
-            checkSousArgs(getattr(listeDArguments, nomArgument[0]), nomArgument)
+            i = 0
+            while i < len(getattr(listeDArguments, nomArgument)):
+                checkSousArgs(getattr(listeDArguments, nomArgument)[i], nomArgument, i)
+                i = i + 1
