@@ -9,12 +9,16 @@ def initLoggingConfig():
     logging.basicConfig(filename='le_fichier_de.log',level=logging.DEBUG)
     #logging.basicConfig(level=logging.DEBUG)
 
+''' Classe hérité de la classe action de argparse '''
 class appendTypeQuantite(argparse.Action):
+    ''' Constructeur '''
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs == 2:
-            super(appendTypeQuantity, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
+            super(appendTypeQuantite, self).__init__(option_strings, dest, nargs=nargs, **kwargs)
         else:
             logging.error("Option %s must have 2 arguments in its definition" % option_strings)
+    
+    ''' Ensemble d'instructions lors de l'appel à cette classe '''
     def __call__(self, parser, namespace, values, option_string=None):
         try:
             quantity = abs(int(values[1]))
