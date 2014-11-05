@@ -15,14 +15,7 @@ listeArgumentsCLI.initListeArguments()
 # On effectue le controle des pourcentages
 #liste = generatePlaylist.checkTotal(listeArgumentsCLI.getListeArguments())
 
-# DEBUGGG
-'''for i in liste:
-    for j in liste[i]:
-        print("argument : " + liste[i][j])
-        j += 1
-    i += 1'''
-    
-    
+
 # Ecriture d'une ligne d'étoiles dans le fichier de log, pour séparrer les infos en fonction de chaque exécution
 logging.debug(listeArgumentsCLI)
 logging.debug(' *****************************************')
