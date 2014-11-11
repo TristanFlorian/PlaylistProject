@@ -12,6 +12,8 @@ Arguments.initLoggingConfig()
 listeArgumentsCLI = Arguments.ligneCommande()
 listeArgumentsCLI.initListeArguments()
 
+listeDeValeurs = listeArgumentsCLI.makeValuesList()
+print(listeDeValeurs)
 # On effectue le controle des pourcentages
 #liste = generatePlaylist.checkTotal(listeArgumentsCLI.getListeArguments())
 
