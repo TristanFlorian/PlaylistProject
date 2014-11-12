@@ -21,7 +21,7 @@ class appendTypeQuantite(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         try:
             quantity = abs(int(values[1]))
-            values[1] = quantity if 100 >= quantity > 0 else None
+            values[1] = quantity if 100 >= quantity else None
         except ValueError:
             logging.error("La qantité saisie n'est pas un nombre (NaN): '" + values[1] + "'")
             sys.exit(1)
@@ -45,18 +45,23 @@ class ligneCommande(object):
         self.parser = argparse.ArgumentParser()
         self.ajoutArguments()
     
+    ''' Initialise l'argument parser '''
     def initListeArguments(self):
         self.arguments = self.parser.parse_args()
     
+    ''' Retourne le dictionnaire '''
     def getDictionnary(self):
         return self.nameList
     
+    ''' Retourne l'ensemble des arguments ainsi que les valeurs qui y sont associées '''
     def getListeArguments(self):
-        return self.parser
+        return self.parser.parse_args()
+    
+    def getNomPlaylist(self):
+        return getattr(self.parser.parser_args(), 'format')
     
     ''' Ajoute la liste des arguments positionnels et optionnels '''
     def ajoutArguments(self):
-        
         # Les arguments positionnels
         ''' Le 1er paramètre correspond au nom que l'on veut attribuer à la playliste [chaine] (Ex: "maPlayliste") '''
         self.parser.add_argument("nom_playlist", help = "Le nom du fichier contenant la playlist.")
@@ -83,57 +88,34 @@ class ligneCommande(object):
                                      help = "Indique qu'on spécifie le pourcentage d'un " + nomArgument + " dans la playliste. [entier naturel] (Ex: 30 -> 30%%)",
                                      action=appendTypeQuantite)
 
-    ''' Génère une liste de liste de valeurs '''
+    ''' Génère une liste de liste de listes de couples de valeurs '''
     def makeValuesList(self):
-        # On créer une liste de liste (avec des )
-        liste = [[0,0]]
-        # Pour chaque argument de la CLI
-        for nomArgument in self.nameList:
+        # Pour chaque argument du parser
+        i = 0
+        values = []
+        for nomArgument in self.getDictionnary():
             # Si l'argument est renseigné
-            if getattr(self.parser.parse_args(), nomArgument) is not None:
-                # On initialise les compteurs à 0
-                i = j = 0
+            if getattr(self.getListeArguments(), nomArgument) is not None:
+                # On initialise un compteur à 0
+                j = 0
+                # Puis on indique qu'il s'agit d'une liste de listes
+                values.append(list())
                 # Comme chaque argument est une liste de liste, car si on renseigne deux fois --genre,
                 # on le stock
                 # Ex : Cli : ... --genre Rock 50 --genre Metal 40
                 #    -> on a [ ['Rock', 50], ['Metal',40] ]
-                # Donc pour chaque liste de l'argument
-                while i < len(getattr(self.parser.parse_args(), nomArgument)):
-                    while j < len(getattr(self.parser.parse_args(), nomArgument)[i]):
-                        # On va mettre les valeurs dans la liste
-                        liste[i][j] = [[getattr(self.parser.parse_args(), nomArgument)[i][0], getattr(self.parser.parse_args(), nomArgument)[i][1]]]
+                while j < len(getattr(self.getListeArguments(), nomArgument)):
+                    if getattr(self.getListeArguments(), nomArgument)[j] is not None:
+                        # On recréer une nouvelle liste dans la liste de liste au cas où il resterait des valeurs au prochain passage
+                        # dans la boucle
+                        values[i].append(list())
+                        # On range les valeurs dans une nouvelle liste de la liste de l'argument
+                        values[i][j].append(getattr(self.getListeArguments(), nomArgument)[j][0])   # Rangement de la chaine
+                        values[i][j].append(getattr(self.getListeArguments(), nomArgument)[j][1])   # Rangement du pourcentage
                         j = j + 1
-                    j = 0
-                    i = i + 1
-        return liste
-
-def getListArgumentsValues(dictionnary, oneParser):
-    #values = [ [[0,0],[0,0]], [[0,0],[0,0]], [[0,0],[0,0]], [[0,0],[0,0]] ]
-    args = oneParser.parse_args()
-    # Pour chaque argument du parser
-    i = 0
-    values = []
-    for nomArgument in dictionnary:
-        # Si l'argument est renseigné
-        if getattr(args, nomArgument) is not None:
-            # On initialise un compteur à 0
-            j = 0
-            values.append(list())
-            # Comme chaque argument est une liste de liste, car si on renseigne deux fois --genre,
-            # on le stock
-            # Ex : Cli : ... --genre Rock 50 --genre Metal 40
-            #    -> on a [ ['Rock', 50], ['Metal',40] ]
-            while j < len(getattr(args, nomArgument)):
-                if getattr(args, nomArgument)[j] is not None:
-                    # On recréer une nouvelle liste dans la liste de liste au cas où il resterait des valeurs au prochain passage
-                    # dans la boucle
-                    values[i].append(list())
-                    # On range les valeurs dans une nouvelle liste de la liste de l'argument
-                    values[i][j].append(getattr(args, nomArgument)[j][0])   # Rangement de la chaine
-                    values[i][j].append(getattr(args, nomArgument)[j][1])   # Rangement du pourcentage
-                    j = j + 1
-            i = i + 1
-    return values
+                i = i + 1
+        # Puis on retourne le tout
+        return values
         
         
         
