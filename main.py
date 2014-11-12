@@ -4,6 +4,7 @@
 import logging
 from GestionDesArguments import Arguments
 import generatePlaylist
+from GestionDesArguments.Arguments import ligneCommande
 
 ''' Traitement du programme principal '''
 # On spécifie la configuration du fichier de log
@@ -12,7 +13,9 @@ Arguments.initLoggingConfig()
 listeArgumentsCLI = Arguments.ligneCommande()
 listeArgumentsCLI.initListeArguments()
 
-listeDeValeurs = listeArgumentsCLI.makeValuesList()
+dictionnaire = listeArgumentsCLI.getDictionnary()
+arguments = listeArgumentsCLI.getListeArguments()
+listeDeValeurs = Arguments.getListArgumentsValues(dictionnaire, arguments)
 print(listeDeValeurs)
 # On effectue le controle des pourcentages
 #liste = generatePlaylist.checkTotal(listeArgumentsCLI.getListeArguments())

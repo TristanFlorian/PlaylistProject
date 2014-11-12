@@ -48,8 +48,11 @@ class ligneCommande(object):
     def initListeArguments(self):
         self.arguments = self.parser.parse_args()
     
+    def getDictionnary(self):
+        return self.nameList
+    
     def getListeArguments(self):
-        return self.parser.parse_args()
+        return self.parser
     
     ''' Ajoute la liste des arguments positionnels et optionnels '''
     def ajoutArguments(self):
@@ -104,37 +107,26 @@ class ligneCommande(object):
                     i = i + 1
         return liste
 
-class listArgumentsValues():
-    ''' Constructeur par défaut '''
-    def __init__(self, dictionnary, oneParser):
-        # Initialisation d'un tableau vide à 3 dimentions 
-        self.values = [[[0,0]]]
-        # Initialisation d'un distionaire correspondant à la liste des arguments optionnels de la CLI
-        # 0 : titre, 1 : genre, 2 : sousgenre, 3 : artiste, 4 : album
-        self.dictionnary = dictionnary
-        # Initialisation du tableau de valeurs
-        self.initListArgumentsValues(self.dictionnary, oneParser)
-        #self.percentageList = 0
-        #self.
-    
-    def initListArgumentsValues(self, dictionnary, oneParser):
-        # Pour chaque argument dans le parser
-        for nomArgument in dictionnary:
-            # On initialise les compteurs à 0
-            i = j = l = 0
-            # Si l'argument est renseigné
-            if getattr(oneParser.parse_args(), nomArgument) is not None:
-                # Comme chaque argument est une liste de liste, car si on renseigne deux fois --genre,
-                # on le stock
-                # Ex : Cli : ... --genre Rock 50 --genre Metal 40
-                #    -> on a [ ['Rock', 50], ['Metal',40] ]
-                # Donc pour chaque liste de l'argument
-                while j < len(getattr(self.parser.parse_args(), nomArgument)):
-                    while l < len(getattr(self.parser.parse_args(), nomArgument)[i]):
-                        # On va mettre les valeurs dans la liste
-                        self.values[i][j][l] = [[[getattr(self.parser.parse_args(), nomArgument)[i][0], getattr(self.parser.parse_args(), nomArgument)[i][1]]]]
-                        l = l + 1
-                    l = 0
-                    j = j + 1
-            i = i + 1
+def getListArgumentsValues(dictionnary, oneParser):
+    values = [[[0,0]]]
+    args = oneParser.parse_args()
+    # Pour chaque argument dans le parser
+    for nomArgument in dictionnary:
+        # On initialise les compteurs à 0
+        i = j = l = 0
+        # Si l'argument est renseigné
+        if getattr(args, nomArgument) is not None:
+            # Comme chaque argument est une liste de liste, car si on renseigne deux fois --genre,
+            # on le stock
+            # Ex : Cli : ... --genre Rock 50 --genre Metal 40
+            #    -> on a [ ['Rock', 50], ['Metal',40] ]
+            # Donc pour chaque liste de l'argument
+            while j < len(getattr(args, nomArgument)):
+                while l < len(getattr(args, nomArgument)[i]):
+                    # On va mettre les valeurs dans la liste
+                    values[i][j][l] = [[[getattr(args, nomArgument)[i][0], getattr(args, nomArgument)[i][1]]]]
+                    l = l + 1
+                l = 0
+                j = j + 1
+        i = i + 1
             
