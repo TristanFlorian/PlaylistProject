@@ -108,25 +108,32 @@ class ligneCommande(object):
         return liste
 
 def getListArgumentsValues(dictionnary, oneParser):
-    values = [[[0,0]]]
+    #values = [ [[0,0],[0,0]], [[0,0],[0,0]], [[0,0],[0,0]], [[0,0],[0,0]] ]
     args = oneParser.parse_args()
-    # Pour chaque argument dans le parser
+    # Pour chaque argument du parser
+    i = 0
+    values = []
     for nomArgument in dictionnary:
-        # On initialise les compteurs à 0
-        i = j = l = 0
         # Si l'argument est renseigné
         if getattr(args, nomArgument) is not None:
+            # On initialise un compteur à 0
+            j = 0
+            values.append(list())
             # Comme chaque argument est une liste de liste, car si on renseigne deux fois --genre,
             # on le stock
             # Ex : Cli : ... --genre Rock 50 --genre Metal 40
             #    -> on a [ ['Rock', 50], ['Metal',40] ]
-            # Donc pour chaque liste de l'argument
             while j < len(getattr(args, nomArgument)):
-                while l < len(getattr(args, nomArgument)[i]):
-                    # On va mettre les valeurs dans la liste
-                    values[i][j][l] = [[[getattr(args, nomArgument)[i][0], getattr(args, nomArgument)[i][1]]]]
-                    l = l + 1
-                l = 0
-                j = j + 1
-        i = i + 1
-            
+                if getattr(args, nomArgument)[j] is not None:
+                    # On recréer une nouvelle liste dans la liste de liste au cas où il resterait des valeurs au prochain passage
+                    # dans la boucle
+                    values[i].append(list())
+                    # On range les valeurs dans une nouvelle liste de la liste de l'argument
+                    values[i][j].append(getattr(args, nomArgument)[j][0])   # Rangement de la chaine
+                    values[i][j].append(getattr(args, nomArgument)[j][1])   # Rangement du pourcentage
+                    j = j + 1
+            i = i + 1
+    return values
+        
+        
+        
