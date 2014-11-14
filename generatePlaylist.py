@@ -66,3 +66,9 @@ def miseEnBaseCent(listeDeValeurs):
 ''' Methode permettant de générer la playliste '''
 def genererLaListeDeMorceaux(listeDeValeurs):
     pass
+    #for i in 
+    
+    
+def genererLaPlayListe(listeDeMorceaux, leFormat):
+    if leFormat == 'm3u':
+        pass

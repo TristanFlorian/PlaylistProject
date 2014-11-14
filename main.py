@@ -12,12 +12,13 @@ Arguments.initLoggingConfig()
 listeArgumentsCLI = Arguments.ligneCommande()
 listeArgumentsCLI.initListeArguments()
 
-listeDeValeurs = listeArgumentsCLI.makeValuesList()
-print(listeDeValeurs)
 # On effectue le controle des pourcentages
-#liste = generatePlaylist.checkTotal(listeArgumentsCLI.getListeArguments())
-listeDeValeurs = generatePlaylist.checkTotal(listeDeValeurs)
-print(listeDeValeurs)
+valeursDeLaCLI = Arguments.valeursCLI(generatePlaylist.checkTotal(listeArgumentsCLI.makeValuesList()), listeArgumentsCLI.argumentsRenseignes)
+print(valeursDeLaCLI.getListeDeValeurs())
+for i in range(len(valeursDeLaCLI.getListeArguments())):
+    print("i = " + str(i) + "\tvaleur : " + str(valeursDeLaCLI.getListeArguments()[i]))
+    print(valeursDeLaCLI.getListeDeValeurs()[i])
+
 
 # Ecriture d'une ligne d'étoiles dans le fichier de log, pour séparrer les infos en fonction de chaque exécution
 logging.debug(' *****************************************')

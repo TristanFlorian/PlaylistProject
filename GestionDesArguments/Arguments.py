@@ -41,6 +41,8 @@ class ligneCommande(object):
     def __init__(self):
         # Dictionnaire, permettant de générer les différents arguments
         self.nameList = ['titre', 'genre', 'sousgenre', 'artiste', 'album']
+        self.formats = ['m3u','xspf','pls']
+        self.argumentsRenseignes = list()
         self.arguments = argparse.Namespace()
         self.parser = argparse.ArgumentParser()
         self.ajoutArguments()
@@ -57,8 +59,13 @@ class ligneCommande(object):
     def getListeArguments(self):
         return self.parser.parse_args()
     
+    ''' Retourne la valeur renseignée par l'utilisateur pour l'argument "--format",
+        ou retourne la valeur 'm3u' si l'argument n'est pas renseigné '''
     def getNomPlaylist(self):
-        return getattr(self.parser.parser_args(), 'format')
+        if (getattr(self.parser.parse_args(), 'format') is None):
+            return getattr(self.parser.parser_args(), 'format')
+        else:
+            return 'm3u'
     
     ''' Ajoute la liste des arguments positionnels et optionnels '''
     def ajoutArguments(self):
@@ -72,9 +79,13 @@ class ligneCommande(object):
         self.parser.add_argument("-f",
                             "--format", 
                             nargs = 1, 
-                            choices=['m3u','xspf','pls'], 
-                            help = "Donne le format de sortie de la playliste (m3u | xspf | pls)")
+                            choices=self.formats, 
+                            help = "Donne le format de sortie de la playliste " + str(self.formats))
+        #Ajout des arguments optionnels en fonction du dictionnaire de la ligneCommande
         for nomArgument in self.nameList:
+            # Si l'argument à ajouter est différent de album et artiste,
+            # on créer un argument réduit composé de l'initiale uniquement,
+            # sinon on créer un argument réduit composé des trois premières lettres de l'argument
             argument = '-' + nomArgument[0] if (nomArgument[0] != 'a') else '-' + nomArgument[0-3]
             if nomArgument[0] != 'a':
                 argument = '-' + nomArgument[0]
@@ -113,9 +124,23 @@ class ligneCommande(object):
                         values[i][j].append(getattr(self.getListeArguments(), nomArgument)[j][0])   # Rangement de la chaine
                         values[i][j].append(getattr(self.getListeArguments(), nomArgument)[j][1])   # Rangement du pourcentage
                         j = j + 1
+                # On insère le nom de l'argument dans le tableau "argumentsRenseignes" afin de savoir que la première liste de listes de couples
+                # de valeurs correspond à l'argument renseigné
+                self.argumentsRenseignes.append(nomArgument)
                 i = i + 1
         # Puis on retourne le tout
         return values
         
+class valeursCLI():
+    def __init__(self, listeArguments, listeDeValeurs):
+        self.listeArguments = listeArguments
+        self.listeDeValeurs = listeDeValeurs
         
-        
+    def getListeArguments(self):
+        return self.listeArguments
+    
+    def getListeDeValeurs(self):
+        return self.listeDeValeurs
+    
+    def setListeDeValeurs(self,listeDeValeurs):
+        self.listeDeValeurs = listeDeValeurs
