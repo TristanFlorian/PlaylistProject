@@ -1,74 +1,53 @@
-''' Si la liste de valeurs contient des valeurs nulles, elles sont remplacées ; si la somme des valeurs
-est différente de 100, on rebase le tout sur 100 '''
-def checkTotal(listeDeValeurs):
-    i = 0
-    j = 0
-    # Si la liste contient des valeurs Nulles, on initialise ces valeurs avec (1 ÷ nbDeValeurs * 100)
-    if (contientDesNone(listeDeValeurs)):
-        listeDeValeurs = refactorisationDesValeursNulles(listeDeValeurs)
-    # Si elle est inférieure à 100, on remet toutes les valeurs de la liste sur une base 100
-    if (105 < getSumFromList(listeDeValeurs) < 95):
-        listeDeValeurs[i][j] = miseEnBaseCent(listeDeValeurs[i][j])
-    # On génère la liste de morceaux en fonction de la liste de pourcentages
-    return listeDeValeurs
-    
-''' Retourne la somme des valeurs de la liste passée en paramètres '''
-def getSumFromList(listeDeValeurs):
-    sommeDesValeurs = 0
-    # On additionne chaque valeur de la liste à la sommeDesValeurs
-    for i in range(len(listeDeValeurs)):
-        for j in range(len(listeDeValeurs[i])):
-            sommeDesValeurs += listeDeValeurs[i][j][1]
-            j += 1
-        i += 1
-    return sommeDesValeurs
+# -*- coding: utf-8 -*-
 
-''' Parcours la liste passée en paramètre et retourne True si une des valeurs est None '''
-def contientDesNone(listeDeValeurs):
-    trouve = False
-    for i in range(len(listeDeValeurs)):
-        for j in range(len(listeDeValeurs[i])):
-            if (listeDeValeurs[i][j][1] is None):
-                trouve = True
-            j += 1
-        i += 1
-    return trouve
-
-''' Pour chaque valeur Nulle dans la liste, on lui attribue la valeur : 1 ÷ nbDeValeurs * 100 ; Puis on retourne la liste modifiée '''
-def refactorisationDesValeursNulles(listeDeValeurs):
-    for i in range(len(listeDeValeurs)):
-        for j in range(len(listeDeValeurs[i])):
-            if (listeDeValeurs[i][j][1] is None):
-                listeDeValeurs[i][j][1] = round((1 / getLenListeDeValeurs(listeDeValeurs) * 100),1)
-            j+= 1
-        i += 1
-    return listeDeValeurs
-
-''' Retourne le nombre de paramètres renseignés '''
-# Ex : -g xxx xx -art xxx xx -t xxx xx
-#  -> On va retourner la valeur 3
-#
-def getLenListeDeValeurs(listeDeValeurs):
-    for i in range(len(listeDeValeurs)):
-        for j in range(len(listeDeValeurs[i])):
-            j+=1
-        i+=1
-    return j
-
-''' Rebase les valeurs sur 100 '''
-def miseEnBaseCent(listeDeValeurs):
-    for i in range(len(listeDeValeurs)):
-        for j in range(len(listeDeValeurs[i])):
-            listeDeValeurs[i][j][1] = round((listeDeValeurs[i][j][1] / (100 / getLenListeDeValeurs(listeDeValeurs))),1)
-        i += 1
-    return listeDeValeurs
+import writePlaylist
+import controlePourcentageTotal
+import connectionBDD
+import sqlalchemy
+import random
 
 ''' Methode permettant de générer la playliste '''
-def genererLaListeDeMorceaux(listeDeValeurs):
-    pass
-    #for i in 
+def genererLaListeDeMorceaux(valeursCLI):
+    global connect
+    playlist = list()
+    # Connexion à la base
+    connect = connectionBDD.initConnection()
+    # Récupération d'un objet de classe sqlalchemy.table qui représente le contenu de la base mais en objet pythonique
+    tableMorceaux = connectionBDD.getTableMorceaux()
     
-    
-def genererLaPlayListe(listeDeMorceaux, leFormat):
-    if leFormat == 'm3u':
-        pass
+    # Pour chaque argument
+    for i in range(len(valeursCLI.getListeArguments())):
+        # On ajoute une musique de la bdd à la playliste,
+        # et on vérifie que la somme de la durée est ~= au pourcentage de l'argument renseigné
+        addedSum = 0
+        while (controlePourcentageTotal.getSumOfOneArgument(valeursCLI.getListeDeValeurs()[i])-5) < addedSum < (controlePourcentageTotal.getSumOfOneArgument(valeursCLI.getListeDeValeurs()[i])+5):
+            playlist[i].append(list())
+            # En fonction de l'argument qu'on traite, on va changer le critère de selection de la requête
+            if valeursCLI.getListeArguments()[i] == 'titre':
+                # Faire une requete pour ajouter une musique correspondant à l'argument renseigné
+                playlist[i] = sqlalchemy.select([tableMorceaux]).where(tableMorceaux.c.titre == valeursCLI.getListeDeValeurs()[i][0][0])
+            elif valeursCLI.getListeArguments()[i] == 'genre':
+                playlist[i] = sqlalchemy.select([tableMorceaux]).where(tableMorceaux.c.genre == valeursCLI.getListeDeValeurs()[i][0][0])
+            elif valeursCLI.getListeArguments()[i] == 'sousgenre':
+                playlist[i] = sqlalchemy.select([tableMorceaux]).where(tableMorceaux.c.sousgenre == valeursCLI.getListeDeValeurs()[i][0][0])
+            elif valeursCLI.getListeArguments()[i] == 'artiste':
+                playlist[i] = sqlalchemy.select([tableMorceaux]).where(tableMorceaux.c.artiste == valeursCLI.getListeDeValeurs()[i][0][0])
+            elif valeursCLI.getListeArguments()[i] == 'album':
+                playlist[i] = sqlalchemy.select([tableMorceaux]).where(tableMorceaux.c.album == valeursCLI.getListeDeValeurs()[i][0][0])
+            else:
+                print("PROBLEME !!!")
+            
+            # On ajoute à la somme, la durée du morceau ajouté
+            addedSum += playlist[i][5]
+            print("sum : " + str(addedSum))
+        i += 1
+    random.shuffle(playlist)
+    return playlist   
+        
+def writeThePlaylistFile(ligneCLI, playlist):
+    if ligneCLI.getFormat() == 'm3u':
+        writePlaylist.writeM3U(ligneCLI, playlist)
+    elif ligneCLI.getFormat() == 'xspf':
+        writePlaylist.writeXSPF(ligneCLI, playlist)
+    elif ligneCLI.getFormat() == 'pls':
+        writePlaylist.writePLS(ligneCLI, playlist)

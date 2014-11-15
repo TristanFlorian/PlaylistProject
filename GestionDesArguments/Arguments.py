@@ -3,6 +3,7 @@
 import logging
 import argparse
 import sys
+import controlePourcentageTotal
 
 ''' Renseigne où se situe le fichier de log, est à quel niveau on y inscrit des données '''
 def initLoggingConfig():
@@ -42,10 +43,13 @@ class ligneCommande(object):
         # Dictionnaire, permettant de générer les différents arguments
         self.nameList = ['titre', 'genre', 'sousgenre', 'artiste', 'album']
         self.formats = ['m3u','xspf','pls']
-        self.argumentsRenseignes = list()
         self.arguments = argparse.Namespace()
         self.parser = argparse.ArgumentParser()
         self.ajoutArguments()
+        self.format = None
+        self.checkFormat()
+        self.argumentsRenseignes = list()
+        
     
     ''' Initialise l'argument parser '''
     def initListeArguments(self):
@@ -58,15 +62,22 @@ class ligneCommande(object):
     ''' Retourne l'ensemble des arguments ainsi que les valeurs qui y sont associées '''
     def getListeArguments(self):
         return self.parser.parse_args()
-    
-    ''' Retourne la valeur renseignée par l'utilisateur pour l'argument "--format",
-        ou retourne la valeur 'm3u' si l'argument n'est pas renseigné '''
+        
     def getNomPlaylist(self):
-        if (getattr(self.parser.parse_args(), 'format') is None):
-            return getattr(self.parser.parser_args(), 'format')
-        else:
-            return 'm3u'
+        return (getattr(self.getListeArguments(), 'nom_playlist'))
     
+    def getFormat(self):
+        return self.format
+        
+    def getArgumentsRenseignes(self):
+        return self.argumentsRenseignes
+    
+    def checkFormat(self):
+        if (getattr(self.parser.parse_args(), 'format')) is None:
+            self.format = 'm3u'
+        else:
+            self.format = getattr(self.parser.parse_args(), 'format')
+                
     ''' Ajoute la liste des arguments positionnels et optionnels '''
     def ajoutArguments(self):
         # Les arguments positionnels
@@ -131,16 +142,26 @@ class ligneCommande(object):
         # Puis on retourne le tout
         return values
         
+''' Classe permettant de travailler plus facilement avec les valeurs saisies dans la CLI, en associant un dictionnaire à la liste de listes de couples de valeurs '''
 class valeursCLI():
+    ''' Constructeur de la classe, prenant la liste des valeurs de la CLI et la liste des arguments renseignés, dans leur ordre '''
     def __init__(self, listeArguments, listeDeValeurs):
         self.listeArguments = listeArguments
         self.listeDeValeurs = listeDeValeurs
+        self.sumPourcentages = controlePourcentageTotal.getSumFromList(listeDeValeurs)
         
+    ''' Accesseur de l'attribut listeArguments '''
     def getListeArguments(self):
         return self.listeArguments
     
+    ''' Accesseur de l'attribut listeDeValeurs '''
     def getListeDeValeurs(self):
         return self.listeDeValeurs
     
+    ''' Accesseur de l'attribut sumPourcentages '''
+    def getSumPourcentages(self):
+        return self.getSumPourcentages()
+    
+    ''' Modificateur de l'attribut listeDeValeurs à partir d'une nouvelle liste de valeurs '''
     def setListeDeValeurs(self,listeDeValeurs):
         self.listeDeValeurs = listeDeValeurs
