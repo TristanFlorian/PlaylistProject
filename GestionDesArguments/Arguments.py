@@ -68,6 +68,9 @@ class ligneCommande(object):
     
     def getFormat(self):
         return self.format
+    
+    def getDureePlaylist(self):
+        return (getattr(self.getListeArguments(), 'temps_playlist'))
         
     def getArgumentsRenseignes(self):
         return self.argumentsRenseignes
@@ -76,7 +79,7 @@ class ligneCommande(object):
         if (getattr(self.parser.parse_args(), 'format')) is None:
             self.format = 'm3u'
         else:
-            self.format = getattr(self.parser.parse_args(), 'format')
+            self.format = getattr(self.parser.parse_args(), 'format')[0]
                 
     ''' Ajoute la liste des arguments positionnels et optionnels '''
     def ajoutArguments(self):

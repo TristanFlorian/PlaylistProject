@@ -8,17 +8,14 @@ import generatePlaylist
 ''' Traitement du programme principal '''
 # On spécifie la configuration du fichier de log
 Arguments.initLoggingConfig()
+print("Analyse de la ligne de commande...\n")
+
 # Création de la liste des arguments
 listeArgumentsCLI = Arguments.ligneCommande()
 listeArgumentsCLI.initListeArguments()
 
-# On effectue le controle des pourcentages
-valeursDeLaCLI = Arguments.valeursCLI(generatePlaylist.checkTotal(listeArgumentsCLI.makeValuesList()), listeArgumentsCLI.argumentsRenseignes)
-print(valeursDeLaCLI.getListeDeValeurs())
-for i in range(len(valeursDeLaCLI.getListeArguments())):
-    print("i = " + str(i) + "\tvaleur : " + str(valeursDeLaCLI.getListeArguments()[i]))
-    print(valeursDeLaCLI.getListeDeValeurs()[i])
-
+print("Génération de la playliste...")
+maPlayliste = generatePlaylist.genererLaListeDeMorceaux(listeArgumentsCLI)
 
 # Ecriture d'une ligne d'étoiles dans le fichier de log, pour séparrer les infos en fonction de chaque exécution
 logging.debug(' *****************************************')
