@@ -12,7 +12,7 @@ def writeM3U(ligneCLI, playlist):
                            " - " + musique[0] + "\n")
         playlistFile.write(musique[8] + "\n\n")
         dureeTotale += musique[5]
-    print("Durée de la playlist : " + str(dureeTotale))
+    #print("Durée de la playlist : " + str(dureeTotale) + " secondes")
     playlistFile.close()
 
 '''Ecriture du fichier de playlist au format XSPF'''

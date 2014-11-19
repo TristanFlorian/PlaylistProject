@@ -62,7 +62,8 @@ class ligneCommande(object):
     ''' Retourne l'ensemble des arguments ainsi que les valeurs qui y sont associées '''
     def getListeArguments(self):
         return self.parser.parse_args()
-        
+    
+    
     def getNomPlaylist(self):
         return (getattr(self.getListeArguments(), 'nom_playlist'))
     
